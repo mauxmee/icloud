@@ -7,6 +7,7 @@ const App = () => {
   const [creds, setCreds] = useState({ email: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null); // State to hold summary data for cards
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -14,6 +15,9 @@ const App = () => {
     setLoading(true);
     try {
       const res = await axios.post('http://localhost:8000/sync', creds);
+      if (res.data.data && res.data.data.length > 0) {
+        setSummary(res.data.data[0]); // Assuming we display data for the first station
+      }
       const analysisRes = await axios.get('http://localhost:8000/analysis');
       setData(analysisRes.data);
       setIsLoggedIn(true);
@@ -80,20 +84,20 @@ const App = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-sm">Daily Generation</p>
-            <h2 className="text-2xl font-bold">14.8 kWh</h2>
+            <h2 className="text-2xl font-bold">{summary?.daily_yield ?? '--'} kWh</h2>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-sm">Monthly Total</p>
-            <h2 className="text-2xl font-bold">482.1 kWh</h2>
+            <h2 className="text-2xl font-bold">{summary?.monthly_yield ?? '--'} kWh</h2>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-sm">Current Output</p>
-            <h2 className="text-2xl font-bold text-yellow-600">3.2 kW</h2>
+            <h2 className="text-2xl font-bold text-yellow-600">{summary?.current_power ?? '--'} kW</h2>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-96">
-          <h3 className="text-lg font-semibold mb-4">Daily Yield Analysis</h3>
+          <h3 className="text-lg font-semibold mb-4">Daily Yield Analysis {summary?.station_name ? `- ${summary.station_name}` : ''}</h3>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
