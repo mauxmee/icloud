@@ -1,3 +1,17 @@
+# Python bytecode and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Compiled binaries (Node/Python executables)
+*.exe
+*.dll
+*.so
+*.dylib
+
 # Logs
 logs
 *.log
